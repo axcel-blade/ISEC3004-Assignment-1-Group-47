@@ -2,4 +2,18 @@ services:
   web:
     build: .
     ports:
-      - "8081:8081"
+      - "8086:8086"
+    environment:
+      DB_SERVER: db
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: bankDB
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
