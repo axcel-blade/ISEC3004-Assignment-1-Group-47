@@ -23,17 +23,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Update Account</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>Update Account Settings</h2>
-    <form action="update_account.php" method="post">
-        <div class="form-group">
-            <label>New Email</label>
-            <input type="email" name="email" class="form-control">
-        </div>
-        <div class="form-group">
-            <input type="submit" class="btn btn-primary" value="Update">
-        </div>
-    </form>
+    <div class="wrapper">
+        <h2>Update Account Settings</h2>
+        <form action="update_account.php" method="post">
+            <div class="form-group">
+                <label>New Email</label>
+                <input type="email" name="email" class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Update">
+            </div>
+        </form>
+        <p><a href="welcome.php">&larr; Back</a></p>
+    </div>
 </body>
 </html>
