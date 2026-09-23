@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once "logger.php";
 
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true)
 {
@@ -45,6 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             $_SESSION["loggedin"] = true;
             $_SESSION["id"] = $row["id"];
             $_SESSION["username"] = $row["username"];
+            app_log("INFO", "Login success: $username");
 
             header("location: welcome.php");
             exit;
@@ -52,6 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         else
         {
             $password_err = "The password you entered was not valid.";
+            app_log("WARNING", "Login failed: $username");
         }
         mysqli_close($link);
     }
