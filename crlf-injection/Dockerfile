@@ -1,8 +1,9 @@
-FROM python:3.12-slim
+FROM php:8.2-cli
+RUN docker-php-ext-install mysqli
 
 WORKDIR /app
-COPY vulnerable-app/server.py .
+COPY vulnerable-app/ .
 
 EXPOSE 8086
 
-CMD ["python", "server.py"]
+CMD ["php", "index.php"]
