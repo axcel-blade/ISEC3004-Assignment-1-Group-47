@@ -2,6 +2,7 @@
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/db.php";
 require_once __DIR__ . "/http.php";
+require_once __DIR__ . "/logger.php";
 require_once __DIR__ . "/views.php";
 
 $sessions = [];
@@ -52,11 +53,13 @@ function handle($conn): void
         if ($row && $row[2] === md5($password)) {
             $sid = bin2hex(random_bytes(16));
             $sessions[$sid] = (int) $row[0];
+            app_log("INFO", "Login success: $username");
             fwrite($conn, safe_header_bytes("HTTP/1.1 302 Found", [
                 ["Location", "/dashboard"],
                 ["Set-Cookie", "session=$sid; HttpOnly"],
             ]));
         } else {
+            app_log("WARNING", "Login failed: $username");
             $html = sprintf(LOGIN_PAGE, "Invalid username or password.");
             fwrite($conn, safe_header_bytes("HTTP/1.1 200 OK", [["Content-Type", "text/html"]]) . $html);
         }
@@ -92,12 +95,14 @@ function handle($conn): void
             if ($amount_val > 0) {
                 update_balance($sender_id, -$amount_val);
                 update_balance($recipient_id_val, $amount_val);
+                app_log("INFO", "Transfer: $amount_val from account $sender_id to account $recipient_id_val");
             }
         }
 
-        // VULNERABLE: 'next' is attacker-controlled and written directly into the
-        // raw response bytes with no CRLF filtering, unlike PHP's header() or a
-        // framework Response, which both reject embedded \r\n.
+        if (strpbrk($next_url, "\r\n") !== false) {
+            app_log("ALERT", "CRLF injection in redirect from account $sender_id: $next_url");
+        }
+
         $response =
             "HTTP/1.1 302 Found\r\n" .
             "Location: " . $next_url . "\r\n" .
@@ -108,6 +113,7 @@ function handle($conn): void
 
     if ($path === "/logout" && $method === "GET") {
         if ($session_id) {
+            app_log("INFO", "Logout: account " . $sessions[$session_id]);
             unset($sessions[$session_id]);
         }
         fwrite($conn, safe_header_bytes("HTTP/1.1 302 Found", [
@@ -130,7 +136,7 @@ function main(): void
         fwrite(STDERR, "bind failed: $errstr ($errno)\n");
         exit(1);
     }
-    echo "SecureBank demo listening on " . HOST . ":" . PORT . "\n";
+    app_log("INFO", "Server started on " . HOST . ":" . PORT);
 
     while (true) {
         $conn = @stream_socket_accept($server, -1);
@@ -140,7 +146,7 @@ function main(): void
         try {
             handle($conn);
         } catch (Throwable $e) {
-            echo "error: " . $e->getMessage() . "\n";
+            app_log("ERROR", $e->getMessage());
         } finally {
             fclose($conn);
         }

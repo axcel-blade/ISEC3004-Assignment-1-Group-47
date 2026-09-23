@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "config.php";
+require_once "logger.php";
 
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
@@ -12,6 +13,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $sql = "UPDATE users SET email = '$new_email' WHERE id = " . $_SESSION["id"];
     mysqli_query($link, $sql);
+
+    $referer = $_SERVER["HTTP_REFERER"] ?? "none";
+    app_log("INFO", "Email changed: user " . $_SESSION["username"] . " -> $new_email (referer: $referer)");
 
     header("location: update_account.php");
     exit;

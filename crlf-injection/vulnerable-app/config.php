@@ -1,6 +1,6 @@
 <?php
 const HOST = "0.0.0.0";
-const PORT = 8086;
+const PORT = 8080;
 
 const DB_USERNAME = "admin";
 const DB_PASSWORD = "admin";
