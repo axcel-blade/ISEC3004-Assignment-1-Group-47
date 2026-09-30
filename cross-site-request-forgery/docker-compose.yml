@@ -1,16 +1,43 @@
 services:
-  web:
-    build: .
+  vulnerable-web:
+    build:
+      context: .
+      args:
+        APP_PORT: 8082
     ports:
-      - "8081:8081"
+      - "8082:8082"
     volumes:
       - ./vulnerable-app:/var/www/html
     environment:
-      DB_SERVER: db
+      DB_SERVER: vulnerable-db
     depends_on:
-      - db
+      - vulnerable-db
 
-  db:
+  vulnerable-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: testDB
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  secure-web:
+    build:
+      context: .
+      args:
+        APP_PORT: 8083
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./secure-app:/var/www/html
+    environment:
+      DB_SERVER: secure-db
+    depends_on:
+      - secure-db
+
+  secure-db:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: admin
