@@ -1,10 +1,6 @@
 <?php
-// VULNERABLE: session cookie is explicitly set to SameSite=None so the browser
-// sends it on cross-site requests. This reproduces classic CSRF behaviour;
-// without this, modern browsers default to SameSite=Lax and would block the
-// forged request at the browser layer, masking the application-level flaw.
-session_set_cookie_params(["samesite" => "None", "secure" => true]);
-session_start();
+require_once "csrf.php";
+secure_session_start();
 require_once "logger.php";
 
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true)
@@ -40,13 +36,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 
     if (empty($username_err) && empty($password_err))
     {
-        $sql = "SELECT id, username FROM users WHERE username = '$username' and password = md5('$password')";
-
-        $result = mysqli_query($link, $sql);
+        //parameterised query
+        $sql = "SELECT id, username FROM users WHERE username = ? AND password = md5(?)";
+        $stmt = mysqli_prepare($link, $sql);
+        mysqli_stmt_bind_param($stmt, "ss", $username, $password);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
         if ($result && mysqli_num_rows($result) > 0)
         {
             $row = mysqli_fetch_assoc($result);
+
+            //generate new session id when privileges change to prevent session fixation
+            session_regenerate_id(true);
 
             $_SESSION["loggedin"] = true;
             $_SESSION["id"] = $row["id"];
@@ -80,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         <form action="login.php" method="post">
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" name="username" autocomplete="off" class="form-control" value="<?php echo $username; ?>">
+                <input type="text" name="username" autocomplete="off" class="form-control" value="<?php echo htmlspecialchars($username); ?>">
                 <span class="help-block"><?php echo $username_err; ?></span>
             </div>
             <div class="form-group">
