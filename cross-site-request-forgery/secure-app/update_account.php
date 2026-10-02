@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h2>Update Account Settings</h2>
         <span class="help-block"><?php echo htmlspecialchars($error); ?></span>
         <form action="update_account.php" method="post">
-            <?php echo csrf_field(); // embeds the hidden token the attacker cannot know ?>
+            <?php echo csrf_field(); //embeds the hidden token the attacker cannot know ?>
             <div class="form-group">
                 <label>New Email</label>
                 <input type="email" name="email" class="form-control">
