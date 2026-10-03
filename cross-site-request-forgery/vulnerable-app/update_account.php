@@ -1,28 +1,24 @@
 <?php
-// VULNERABLE: session cookie is explicitly set to SameSite=None so the browser
-// sends it on cross-site requests. This reproduces classic CSRF behaviour;
-// without this, modern browsers default to SameSite=Lax and would block the
-// forged request at the browser layer, masking the application-level flaw.
+//vulnerabilty
+//SameSite=None lets the browser send the session cookie on cross site requests,
+//making it a CSRF vulnerability.
 session_set_cookie_params(["samesite" => "None", "secure" => true]);
 session_start();
 require_once "config.php";
 require_once "logger.php";
 
-/*
- * VULNERABLE: Cross-Site Request Forgery (CSRF)
- *
- * This endpoint performs a state-changing action (updating the account email)
- * but authenticates the request using ONLY the session cookie. It never verifies
- * that the request actually came from our own site:
- *   - no anti-CSRF token is required,
- *   - the Origin/Referer header is not checked,
- *   - the session cookie has no SameSite restriction.
- *
- * Because browsers automatically attach the session cookie to ANY request to
- * this domain, a malicious page on another origin can auto-submit a hidden form
- * (see ../exploit/attacker.html) and silently change the victim's email while
- * they are logged in. That stolen email can then be used for a password reset,
- * leading to full account takeover.
+/**
+ * Vulnerabilty
+ * 
+ * This is an endpoint that updates the email using session cookie to authenticate the request,
+ * but it doesnt check if the request came from the same site.
+ * 
+ * There is no CSRF token, origin/refer headers are not checked, and the session cookie 
+ * has no SameSite restriction.
+ * 
+ * the browser includes the session cookie with the cross site request, so a attacker can submit a 
+ * hidden form from another site when the user is logged in
+ * 
  */
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
@@ -30,8 +26,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // RISK: the POST body is trusted with no CSRF token and no origin check,
-    // so a forged cross-site request is processed exactly like a legitimate one.
+    //there is no CSRF token or origin check for this POST, a forged cross site request 
+    //is treated as a normal request
     $new_email = $_POST["email"];
 
     $sql = "UPDATE users SET email = '$new_email' WHERE id = " . $_SESSION["id"];
