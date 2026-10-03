@@ -1,8 +1,7 @@
 <?php
-// VULNERABLE: session cookie is explicitly set to SameSite=None so the browser
-// sends it on cross-site requests. This reproduces classic CSRF behaviour;
-// without this, modern browsers default to SameSite=Lax and would block the
-// forged request at the browser layer, masking the application-level flaw.
+//vulnerabilty
+//SameSite=None lets the browser send the session cookie on cross site requests,
+//making it a CSRF vulnerability.
 session_set_cookie_params(["samesite" => "None", "secure" => true]);
 session_start();
 
