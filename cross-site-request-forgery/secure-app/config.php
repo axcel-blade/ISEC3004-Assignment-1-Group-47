@@ -1,12 +1,14 @@
 <?php
-define('DB_SERVER', getenv('DB_SERVER') ?: 'localhost');
-define('DB_USERNAME', 'admin');
-define('DB_PASSWORD', 'admin');
-define('DB_NAME', 'testDB');
+define('DB_PATH', getenv('DB_PATH') ?: __DIR__ . DIRECTORY_SEPARATOR . 'database.sqlite');
 
-$link = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-
-if($link === false){
-    die("ERROR: Could not connect. " . mysqli_connect_error());
+try {
+    $link = new PDO('sqlite:' . DB_PATH);
+    $link->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $link->exec('PRAGMA busy_timeout = 5000');
+    $link->sqliteCreateFunction('md5', static function ($value) {
+        return md5((string) $value);
+    });
+} catch (PDOException $e) {
+    die('ERROR: Could not connect. ' . $e->getMessage());
 }
 ?>

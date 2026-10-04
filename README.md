@@ -1,2 +1,0 @@
-# ISEC3004-Assignment-1-Group-47
-## Develop
