@@ -3,22 +3,8 @@ services:
     build: .
     ports:
       - "8080:8080"
-    environment:
-      DB_SERVER: vulnerable-db
     volumes:
       - ./vulnerable-app:/app
-    depends_on:
-      - vulnerable-db
-
-  vulnerable-db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: bankDB
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   secure-web:
     build:
@@ -27,19 +13,5 @@ services:
         APP_DIR: secure-app
     ports:
       - "8081:8081"
-    environment:
-      DB_SERVER: secure-db
     volumes:
       - ./secure-app:/app
-    depends_on:
-      - secure-db
-
-  secure-db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: bankDB
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql

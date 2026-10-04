@@ -8,20 +8,6 @@ services:
       - "8082:8082"
     volumes:
       - ./vulnerable-app:/var/www/html
-    environment:
-      DB_SERVER: vulnerable-db
-    depends_on:
-      - vulnerable-db
-
-  vulnerable-db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: testDB
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   secure-web:
     build:
@@ -32,17 +18,3 @@ services:
       - "8083:8083"
     volumes:
       - ./secure-app:/var/www/html
-    environment:
-      DB_SERVER: secure-db
-    depends_on:
-      - secure-db
-
-  secure-db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: testDB
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql

@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
-    email VARCHAR(100),
-    password VARCHAR(100) NOT NULL
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    email TEXT,
+    password TEXT NOT NULL
 );
 
-INSERT INTO users (username, email, password) VALUES ('demo', 'demo@example.com', md5('demo123'));
+INSERT INTO users (username, email, password) VALUES ('demo', 'demo@example.com', '62cc2d8b4bf2d8728120d052163a77df');

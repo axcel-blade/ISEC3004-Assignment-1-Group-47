@@ -41,11 +41,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     {
         $sql = "SELECT id, username FROM users WHERE username = '$username' and password = md5('$password')";
 
-        $result = mysqli_query($link, $sql);
+        try {
+            $result = $link->query($sql);
+            $row = $result ? $result->fetch(PDO::FETCH_ASSOC) : false;
+        } catch (PDOException $e) {
+            $row = false;
+        }
 
-        if ($result && mysqli_num_rows($result) > 0)
+        if ($row)
         {
-            $row = mysqli_fetch_assoc($result);
 
             $_SESSION["loggedin"] = true;
             $_SESSION["id"] = $row["id"];
@@ -60,7 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             $password_err = "The password you entered was not valid.";
             app_log("WARNING", "Login failed: $username");
         }
-        mysqli_close($link);
     }
 }
 ?>
