@@ -38,14 +38,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     {
         //parameterised query
         $sql = "SELECT id, username FROM users WHERE username = ? AND password = md5(?)";
-        $stmt = mysqli_prepare($link, $sql);
-        mysqli_stmt_bind_param($stmt, "ss", $username, $password);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
+        $stmt = $link->prepare($sql);
+        $stmt->execute([$username, $password]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($result && mysqli_num_rows($result) > 0)
+        if ($row)
         {
-            $row = mysqli_fetch_assoc($result);
 
             //generate new session id when privileges change to prevent session fixation
             session_regenerate_id(true);
@@ -63,7 +61,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             $password_err = "The password you entered was not valid.";
             app_log("WARNING", "Login failed: $username");
         }
-        mysqli_close($link);
     }
 }
 ?>

@@ -25,9 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $new_email = $_POST["email"];
 
         //parameterised query
-        $stmt = mysqli_prepare($link, "UPDATE users SET email = ? WHERE id = ?");
-        mysqli_stmt_bind_param($stmt, "si", $new_email, $_SESSION["id"]);
-        mysqli_stmt_execute($stmt);
+        $stmt = $link->prepare("UPDATE users SET email = ? WHERE id = ?");
+        $stmt->execute([$new_email, $_SESSION["id"]]);
 
         app_log("INFO", "Email changed: user " . $_SESSION["username"] . " -> $new_email");
 

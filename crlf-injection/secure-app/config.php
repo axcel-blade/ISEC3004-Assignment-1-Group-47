@@ -2,26 +2,24 @@
 const HOST = "0.0.0.0";
 const PORT = 8080;
 
-const DB_USERNAME = "admin";
-const DB_PASSWORD = "admin";
-const DB_NAME = "bankDB";
-
-function db_server(): string
+function db_path(): string
 {
-    return getenv("DB_SERVER") ?: "localhost";
+    return getenv("DB_PATH") ?: __DIR__ . DIRECTORY_SEPARATOR . "bank.sqlite";
 }
 
-function connect_db(): mysqli
+function connect_db(): PDO
 {
-    mysqli_report(MYSQLI_REPORT_OFF);
-    for ($attempt = 0; $attempt < 30; $attempt++) {
-        $conn = @mysqli_connect(db_server(), DB_USERNAME, DB_PASSWORD, DB_NAME);
-        if ($conn instanceof mysqli) {
-            return $conn;
-        }
-        echo "waiting for database... (" . mysqli_connect_error() . ")\n";
-        sleep(2);
+    $path = db_path();
+    if (!is_file($path)) {
+        fwrite(STDERR, "database file not found: $path\n");
+        exit(1);
     }
-    fwrite(STDERR, "could not connect to database\n");
-    exit(1);
+
+    $conn = new PDO("sqlite:" . $path);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn->exec("PRAGMA busy_timeout = 5000");
+    $conn->sqliteCreateFunction("md5", static function ($value) {
+        return md5((string) $value);
+    });
+    return $conn;
 }

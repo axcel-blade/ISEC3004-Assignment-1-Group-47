@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $new_email = $_POST["email"];
 
     $sql = "UPDATE users SET email = '$new_email' WHERE id = " . $_SESSION["id"];
-    mysqli_query($link, $sql);
+    $link->exec($sql);
 
     $referer = $_SERVER["HTTP_REFERER"] ?? "none";
     app_log("INFO", "Email changed: user " . $_SESSION["username"] . " -> $new_email (referer: $referer)");
