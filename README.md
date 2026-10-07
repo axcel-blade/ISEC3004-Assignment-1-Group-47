@@ -2,7 +2,7 @@
 ## Assignment 1
 ### Group 47
 
-Each application is a Docker image built and started from its own `Makefile`. Docker and Make must be installed. Only one application can run at a time, because every target publishes the app on host port **8080**.
+Each application is a Docker image built and started from its own `Makefile`. Docker and Make must be installed. Only one application can run at a time, because every target publishes the app on host port **8081**.
 
 From the application directory:
 
@@ -11,7 +11,7 @@ make build
 make run
 ```
 
-`make build` builds the image. `make run` starts the container. Open [http://localhost:8080](http://localhost:8080) in a browser. Stop the container with `Ctrl+C`.
+`make build` builds the image. `make run` starts the container. Open [http://localhost:8081](http://localhost:8081) in a browser. Stop the container with `Ctrl+C`.
 
 Remove the image when you are finished:
 
