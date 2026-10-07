@@ -12,5 +12,5 @@ USER secure_programming
 
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["php", "index.php"]
