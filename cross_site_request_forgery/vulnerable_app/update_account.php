@@ -3,23 +3,11 @@
 //SameSite=None lets the browser send the session cookie on cross site requests,
 //making it a CSRF vulnerability.
 session_set_cookie_params(["samesite" => "None", "secure" => true]);
+require_once "session.php";
 session_start();
 require_once "config.php";
 require_once "logger.php";
 
-/**
- * Vulnerabilty
- * 
- * This is an endpoint that updates the email using session cookie to authenticate the request,
- * but it doesnt check if the request came from the same site.
- * 
- * There is no CSRF token, origin/refer headers are not checked, and the session cookie 
- * has no SameSite restriction.
- * 
- * the browser includes the session cookie with the cross site request, so a attacker can submit a 
- * hidden form from another site when the user is logged in
- * 
- */
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
     exit;
