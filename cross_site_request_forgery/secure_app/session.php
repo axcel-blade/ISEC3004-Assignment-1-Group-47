@@ -1,8 +1,4 @@
 <?php
-/**
- * Stores PHP sessions in the SQLite database instead of the default
- * in-memory/temporary file storage, so sessions survive server restarts.
- */
 require_once __DIR__ . DIRECTORY_SEPARATOR . "config.php";
 
 $link->exec("CREATE TABLE IF NOT EXISTS sessions (

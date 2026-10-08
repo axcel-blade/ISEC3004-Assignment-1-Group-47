@@ -7,20 +7,6 @@ $link->exec("CREATE TABLE IF NOT EXISTS csrf_tokens (
     created_at INTEGER NOT NULL
 )");
 
-/**
- * This uses CSRF protection by using session tokens and a hardened session cookie.
- * The vulerable app accepts any authenticated POST, making another site trick 
- * a user's browser into sending requests on their behalf.
- * 
- * This secure app uses three checks, SameSite=Strict keeps the session cookies out of cross site requests,
- * each session has a CSRF token included in every form and checked when a POST changes data,
- * and origin/refer checks to provide another layer of protection.
- * 
- */
-
-/**
- * This starts a session with a stricter cookie setting
- */
 function secure_session_start()
 {
     if (session_status() === PHP_SESSION_ACTIVE) {
