@@ -7,6 +7,7 @@ if (isset($_SESSION["username"])) {
     app_log("INFO", "Logout: " . $_SESSION["username"]);
 }
 
+csrf_clear(session_id());
 $_SESSION = array();
 session_destroy();
 

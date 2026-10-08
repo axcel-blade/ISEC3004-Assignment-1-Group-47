@@ -3,6 +3,7 @@
 //SameSite=None lets the browser send the session cookie on cross site requests,
 //making it a CSRF vulnerability.
 session_set_cookie_params(["samesite" => "None", "secure" => true]);
+require_once "session.php";
 session_start();
 
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
