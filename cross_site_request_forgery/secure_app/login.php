@@ -46,7 +46,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         {
 
             //generate new session id when privileges change to prevent session fixation
+            $old_session_id = session_id();
             session_regenerate_id(true);
+            csrf_clear($old_session_id);
 
             $_SESSION["loggedin"] = true;
             $_SESSION["id"] = $row["id"];

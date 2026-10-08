@@ -1,4 +1,12 @@
 <?php
+require_once __DIR__ . DIRECTORY_SEPARATOR . "session.php";
+
+$link->exec("CREATE TABLE IF NOT EXISTS csrf_tokens (
+    session_id TEXT PRIMARY KEY,
+    token TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+)");
+
 /**
  * This uses CSRF protection by using session tokens and a hardened session cookie.
  * The vulerable app accepts any authenticated POST, making another site trick 
@@ -34,10 +42,29 @@ function secure_session_start()
  */
 function csrf_token()
 {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    global $link;
+
+    $stmt = $link->prepare("SELECT token FROM csrf_tokens WHERE session_id = ?");
+    $stmt->execute([session_id()]);
+    $token = $stmt->fetchColumn();
+
+    if ($token === false) {
+        $token = bin2hex(random_bytes(32));
+        $stmt = $link->prepare("REPLACE INTO csrf_tokens (session_id, token, created_at) VALUES (?, ?, ?)");
+        $stmt->execute([session_id(), $token, time()]);
     }
-    return $_SESSION['csrf_token'];
+    return $token;
+}
+
+/**
+ * This removes the CSRF token stored for a session
+ */
+function csrf_clear($session_id)
+{
+    global $link;
+
+    $stmt = $link->prepare("DELETE FROM csrf_tokens WHERE session_id = ?");
+    $stmt->execute([$session_id]);
 }
 
 /**
@@ -55,8 +82,13 @@ function csrf_field()
 function csrf_validate()
 {
     //synchronizer token check
+    global $link;
+
     $submitted = $_POST['csrf_token'] ?? '';
-    if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $submitted)) {
+    $stmt = $link->prepare("SELECT token FROM csrf_tokens WHERE session_id = ?");
+    $stmt->execute([session_id()]);
+    $stored = $stmt->fetchColumn();
+    if ($stored === false || !hash_equals($stored, (string)$submitted)) {
         return false;
     }
 
